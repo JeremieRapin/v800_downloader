@@ -81,6 +81,14 @@ void V800export::export_sessions(QList<QString> sessions, unsigned char mode)
                     emit export_session_error(sessions[sessions_iter], HRM_ERROR);
             }
 
+            if(mode & PDD_EXPORT)
+            {
+                QString pdd(QString(tr("%1/%2.pdd")).arg(default_dir).arg(p_tag));
+
+                if(!parser.writePDD(pdd))
+                    emit export_session_error(sessions[sessions_iter], PDD_ERROR);
+            }
+
             if(mode & GPX_EXPORT)
             {
                 QString gpx(QString(tr("%1/%2.gpx")).arg(default_dir).arg(multi_sessions[multi_sessions_iter]));

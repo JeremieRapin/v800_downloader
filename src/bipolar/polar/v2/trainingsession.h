@@ -47,7 +47,8 @@ public:
         GpxOutput = 0x0001,
         HrmOutput = 0x0002,
         TcxOutput = 0x0004,
-        AllOutputs = GpxOutput|HrmOutput|TcxOutput
+        PddOutput = 0x0008,
+        AllOutputs = GpxOutput|HrmOutput|TcxOutput|PddOutput
     };
     Q_DECLARE_FLAGS(OutputFormats, OutputFormat)
 
@@ -71,6 +72,11 @@ public:
     };
     Q_DECLARE_FLAGS(TcxOptions, TcxOption)
 
+    enum PddOption {
+        None  = 0x0001,
+    };
+    Q_DECLARE_FLAGS(PddOptions, PddOption)
+
     TrainingSession(const QString &baseName);
 
     int exerciseCount() const;
@@ -86,9 +92,11 @@ public:
     void setGpxOption(const GpxOption option, const bool enabled = true);
     void setHrmOption(const HrmOption option, const bool enabled = true);
     void setTcxOption(const TcxOption option, const bool enabled = true);
+    void setPddOption(const PddOption option, const bool enabled = true);
     void setGpxOptions(const GpxOptions options);
     void setHrmOptions(const HrmOptions options);
     void setTcxOptions(const TcxOptions options);
+    void setPddOptions(const PddOptions options);
 
     QString writeGPX(const QString &fileNameFormat, QString outputDirName);
     bool writeGPX(const QString &fileName) const;
@@ -96,6 +104,9 @@ public:
 
     QStringList writeHRM(const QString &fileNameFormat, QString outputDirName);
     QStringList writeHRM(const QString &baseName) const;
+
+    QString writePDD(const QString &fileNameFormat, QString outputDirName);
+    bool writePDD(const QString &fileName) const;
 
     QString writeTCX(const QString &fileNameFormat, QString outputDirName);
     bool writeTCX(const QString &fileName) const;
@@ -110,6 +121,7 @@ protected:
     GpxOptions gpxOptions;
     HrmOptions hrmOptions;
     TcxOptions tcxOptions;
+    PddOptions pddOptions;
 
     static QString getTcxCadenceSensor(const quint64 &polarSportValue);
     static QString getTcxSport(const quint64 &polarSportValue);
@@ -142,6 +154,8 @@ protected:
 
     QStringList toHRM(const bool rrDataOnly = false) const;
 
+    QString toPDD(void) const;
+
     QDomDocument toTCX(const QString &buildTime = QString()) const;
 
     QByteArray unzip(const QByteArray &data,
@@ -160,6 +174,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(TrainingSession::OutputFormats);
 Q_DECLARE_OPERATORS_FOR_FLAGS(TrainingSession::GpxOptions);
 Q_DECLARE_OPERATORS_FOR_FLAGS(TrainingSession::HrmOptions);
 Q_DECLARE_OPERATORS_FOR_FLAGS(TrainingSession::TcxOptions);
+Q_DECLARE_OPERATORS_FOR_FLAGS(TrainingSession::PddOptions);
 
 }}
 

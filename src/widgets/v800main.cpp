@@ -76,7 +76,9 @@ V800Main::V800Main(QWidget *parent) :
     ui->fsBtn->setVisible(false);
     ui->uploadBtn->setVisible(false);
 
-    ui->tcxBox->setChecked(true);
+    ui->hrmBox->setChecked(true);
+    ui->pddBox->setChecked(true);
+    ui->gpxBox->setChecked(true);
 
     disable_all();
 
@@ -178,6 +180,7 @@ void V800Main::handle_sessions_done()
 
     unsigned char export_mask = (ui->tcxBox->isChecked() ? V800export::TCX_EXPORT : 0x00) |
                                 (ui->hrmBox->isChecked() ? V800export::HRM_EXPORT : 0x00) |
+                                (ui->pddBox->isChecked() ? V800export::PDD_EXPORT : 0x00) |
                                 (ui->gpxBox->isChecked() ? V800export::GPX_EXPORT : 0x00);
     emit export_sessions(sessions_to_export, export_mask);
 }
@@ -225,6 +228,9 @@ void V800Main::handle_export_session_error(QString session, int error)
     if(error == V800export::HRM_ERROR)
         error_list.append(QString(tr("%1: Error making HRM file")).arg(session));
 
+    if(error == V800export::PDD_ERROR)
+        error_list.append(QString(tr("%1: Error making PDD file")).arg(session));
+
     if(error == V800export::GPX_ERROR)
         error_list.append(QString(tr("%1: Error making GPX file")).arg(session));
 }
@@ -253,6 +259,7 @@ void V800Main::enable_all()
     ui->dirSelectBtn->setEnabled(true);
     ui->tcxBox->setEnabled(true);
     ui->hrmBox->setEnabled(true);
+    ui->pddBox->setEnabled(true);
     ui->gpxBox->setEnabled(true);
 }
 
@@ -266,6 +273,7 @@ void V800Main::disable_all()
     ui->dirSelectBtn->setEnabled(false);
     ui->tcxBox->setEnabled(false);
     ui->hrmBox->setEnabled(false);
+    ui->pddBox->setEnabled(false);
     ui->gpxBox->setEnabled(false);
 }
 
@@ -290,6 +298,7 @@ void V800Main::on_downloadBtn_clicked()
         {
             export_mask = (ui->tcxBox->isChecked() ? V800export::TCX_EXPORT : 0x00) |
                           (ui->hrmBox->isChecked() ? V800export::HRM_EXPORT : 0x00) |
+                          (ui->pddBox->isChecked() ? V800export::PDD_EXPORT : 0x00)  |
                           (ui->gpxBox->isChecked() ? V800export::GPX_EXPORT : 0x00);
 
             QStringList session_split = (QDateTime::fromString(ui->exerciseTree->topLevelItem(item_iter)->text(0), Qt::TextDate)).toString(tr("yyyyMMdd/HHmmss")).split(tr("/"));
@@ -304,6 +313,9 @@ void V800Main::on_downloadBtn_clicked()
             if(export_mask & V800export::GPX_EXPORT)
                 if(QFile::exists(QString(tr("%1/%2_0.gpx")).arg(default_dir).arg(tag)))
                     export_exists |= V800export::GPX_EXPORT;
+            if(export_mask & V800export::PDD_EXPORT)
+                if(QFile::exists(QString(tr("%1/%2.pdd")).arg(default_dir).arg(t_pdd)))
+                    export_exists |= V800export::PDD_EXPORT;
 
             if(export_mask != export_exists)
                 sessions.append(ui->exerciseTree->topLevelItem(item_iter)->text(0));

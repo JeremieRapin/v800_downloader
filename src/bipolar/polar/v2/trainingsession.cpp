@@ -994,6 +994,20 @@ void TrainingSession::setHrmOptions(const HrmOptions options)
     hrmOptions = options;
 }
 
+void TrainingSession::setPddOption(const PddOption option, const bool enabled)
+{
+    if (enabled) {
+        pddOptions |= option;
+    } else {
+        pddOptions &= ~option;
+    }
+}
+
+void TrainingSession::setPddOptions(const PddOptions options)
+{
+    pddOptions = options;
+}
+
 void TrainingSession::setTcxOption(const TcxOption option, const bool enabled)
 {
     if (enabled) {
@@ -1479,6 +1493,137 @@ QDomDocument TrainingSession::toGPX(const QDateTime &creationTime) const
         }
     }
     return doc;
+}
+/// see @ http://www.polar.com/files/Polar_PWD_PDD_file%20format.pdf
+QString TrainingSession::toPDD(void) const
+{
+    QString pddData;
+    QTextStream stream(&pddData);
+
+    foreach (const QVariant &exercise, parsedExercises) {
+        const QVariantMap map = exercise.toMap();
+        const QVariantMap autoLaps   = map.value(AUTOLAPS).toMap();
+        const QVariantMap create     = map.value(CREATE).toMap();
+        const QVariantMap manualLaps = map.value(LAPS).toMap();
+        const QVariantMap samples    = map.value(SAMPLES).toMap();
+        const QVariantMap stats      = map.value(STATISTICS).toMap();
+        const QVariantMap zones      = map.value(ZONES).toMap();
+
+        const QDateTime startTime = getDateTime(firstMap(create.value(QLatin1String("start"))));
+
+        //Daily Information
+        //Header
+        stream << "[DayInfo]\r\n";
+        //Row 0
+        stream << "100\t1\t7\t6\t1\t512\r\n";
+        //Row 1
+        stream << startTime.toString(QLatin1String("yyyyMMdd")) << "\t1\t0\t0\t0\t0\r\n";
+        //Row 2
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 3
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 4
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 5
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 6
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 7
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+
+        //Daily Information
+        //Header
+        stream << "\r\n\r\n[ExerciseInfo1]\r\n";
+        //Row 0
+        stream << "101\t1\t24\t6\t12\t512\r\n";
+        //Row 1
+        stream << "0\t0\t0\t6\t12\t512\r\n";
+        //Row 2
+        stream << "1\t";
+        stream << qRound(first(create.value(QLatin1String("distance"))).toFloat()/100.0) << "\t";
+        stream << "0\t0\t0\t";
+        stream << qRound(first(create.value(QLatin1String("calories"))).toFloat()) << "\r\n";
+        //Row 3
+        stream << qRound(first(create.value(QLatin1String("distance"))).toFloat()) << "\t";
+        stream << "0\t0\t0\t0\t";
+        stream << qRound(first(create.value(QLatin1String("ascent"))).toFloat()) << "\r\n";
+        //Row 4
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 5
+        QList<QString> loc_time;
+        int lastZone = 0;
+        int total = (getDuration(firstMap(create.value(QLatin1String("duration")))) / 1000);
+        QVariantList hrZones = zones.value(QLatin1String("heartrate")).toList();
+        for (int index = 0; (hrZones.length() > 3) && (index < hrZones.length()); ++index) {
+            const QVariantMap hrZone = hrZones.at(index).toMap();
+            const quint64 duration = getDuration(firstMap(hrZone.value(QLatin1String("duration"))));
+            loc_time.push_front(QString::number(duration / 1000));
+            lastZone += (duration / 1000);
+        }
+
+        loc_time.push_back(QString::number(total - lastZone));
+
+        QList<QString>::iterator it = loc_time.begin();
+        for(; it != loc_time.end(); ++it){
+            stream << *it << "\t";
+        }
+        stream << "\r\n";
+        //Row 6
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 7
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 8
+        stream << "0\t0\t0\t0";
+        const quint64 recordInterval = getDuration(firstMap(samples.value(QLatin1String("record-interval"))));
+        stream << qRound(recordInterval / 1000.0) << "\t";
+        stream << qRound(first(create.value(QLatin1String("ascent"))).toFloat()) << "\r\n";
+        //Row 9
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 10
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 11
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 12
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 13
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 14
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 15
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 16
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 17
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 18
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 19
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 20
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 21
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 22
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 23
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Row 24
+        stream << "0\t0\t0\t0\t0\t0\r\n";
+        //Name
+        stream << "\r\n";
+        //Comment
+        stream << "\r\n";
+        //HRM link
+        stream << startTime.toString(QLatin1String("yyMMdd")) << "01.hrm\r\n";
+        //Hyperlink
+        stream << "\r\n";
+        //Hyperlink Info text
+        stream << "\r\n";
+        //Location
+        stream << startTime.toString(QLatin1String("yyMMdd")) << "01.gpx\r\n";
+    }
+
+    return pddData;
 }
 
 /// @see http://www.polar.com/files/Polar_HRM_file%20format.pdf
@@ -2431,6 +2576,38 @@ bool TrainingSession::writeGPX(QIODevice &device) const
     }
     device.write(gpx.toByteArray());
     return true;
+}
+
+QString TrainingSession::writePDD(const QString &fileNameFormat, QString outputDirName)
+{
+    if (outputDirName.isEmpty()) {
+        outputDirName = QFileInfo(baseName).dir().absolutePath();
+    }
+    const QString fileName = QString::fromLatin1("%1/%2.pdd")
+        .arg(outputDirName).arg(getOutputBaseFileName(fileNameFormat));
+    writePDD(fileName);
+    return fileName;
+}
+
+bool TrainingSession::writePDD(const QString &fileName) const
+{
+    QFile file(fileName);
+    bool ret = false;
+
+    if (!file.open(QIODevice::WriteOnly|QIODevice::Truncate)) {
+        qWarning() << "Failed to open" << QDir::toNativeSeparators(fileName);
+    } else {
+        QString pdd = toPDD();
+        if (pdd.isNull()) {
+            qWarning() << "Failed to convert to PDD" << baseName;
+        }
+        else {
+            file.write(pdd.toStdString().c_str());
+            file.close();
+            ret = true;
+        }
+    }
+    return ret;
 }
 
 QStringList TrainingSession::writeHRM(const QString &fileNameFormat,

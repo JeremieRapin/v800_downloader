@@ -31,7 +31,8 @@ public:
     enum {
         TCX_EXPORT = 0x01,
         HRM_EXPORT = 0x02,
-        GPX_EXPORT = 0x04
+        GPX_EXPORT = 0x04,
+        PDD_EXPORT = 0x08
     };
 
     enum {
@@ -39,7 +40,8 @@ public:
         PARSE_ERROR,
         TCX_ERROR,
         HRM_ERROR,
-        GPX_ERROR
+        GPX_ERROR,
+        PDD_ERROR
     };
 
 signals:

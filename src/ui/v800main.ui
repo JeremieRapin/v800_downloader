@@ -74,6 +74,13 @@ Output Directory</string>
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="pddBox">
+         <property name="text">
+          <string>PDD Output</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="checkBtn">
          <property name="text">
           <string>Check All</string>
