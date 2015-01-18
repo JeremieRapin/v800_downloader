@@ -302,16 +302,18 @@ void V800Main::on_downloadBtn_clicked()
                           (ui->gpxBox->isChecked() ? V800export::GPX_EXPORT : 0x00);
 
             QStringList session_split = (QDateTime::fromString(ui->exerciseTree->topLevelItem(item_iter)->text(0), Qt::TextDate)).toString(tr("yyyyMMdd/HHmmss")).split(tr("/"));
-            QString tag = QDateTime(QDate::fromString(session_split[0], tr("yyyyMMdd")), QTime::fromString(session_split[1], tr("HHmmss"))).toString(tr("yyyyMMddhhmmss"));
+            QString tag = QDateTime(QDate::fromString(session_split[0], tr("yyyyMMdd")), QTime::fromString(session_split[1], tr("HHmmss"))).toString(tr("yyMMdd"));
+            QString t_pdd = QDate(QDate::fromString(session_split[0], tr("yyyyMMdd"))).toString(tr("yyyyMMdd"));
+
 
             if(export_mask & V800export::TCX_EXPORT)
-                if(QFile::exists(QString(tr("%1/%2_0.tcx")).arg(default_dir).arg(tag)))
+                if(QFile::exists(QString(tr("%1/%2.tcx")).arg(default_dir).arg(tag)))
                     export_exists |= V800export::TCX_EXPORT;
             if(export_mask & V800export::HRM_EXPORT)
-                if(QFile::exists(QString(tr("%1/%2_0.hrm")).arg(default_dir).arg(tag)))
+                if(QFile::exists(QString(tr("%1/%2.hrm")).arg(default_dir).arg(tag)))
                     export_exists |= V800export::HRM_EXPORT;
             if(export_mask & V800export::GPX_EXPORT)
-                if(QFile::exists(QString(tr("%1/%2_0.gpx")).arg(default_dir).arg(tag)))
+                if(QFile::exists(QString(tr("%1/%2.gpx")).arg(default_dir).arg(tag)))
                     export_exists |= V800export::GPX_EXPORT;
             if(export_mask & V800export::PDD_EXPORT)
                 if(QFile::exists(QString(tr("%1/%2.pdd")).arg(default_dir).arg(t_pdd)))

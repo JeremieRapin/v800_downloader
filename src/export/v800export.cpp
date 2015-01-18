@@ -66,6 +66,10 @@ void V800export::export_sessions(QList<QString> sessions, unsigned char mode)
             if(!parser.parse())
                 emit export_session_error(sessions[sessions_iter], PARSE_ERROR);
 
+            QString tag = QDateTime::fromString(sessions[sessions_iter], tr("yyyyMMddHHmmss")).toString(tr("yyMMdd"));
+            tag.append(tr("01"));
+            QString p_tag = QDateTime::fromString(sessions[sessions_iter], tr("yyyyMMddHHmmss")).toString(tr("yyyyMMdd"));
+
             if(mode & TCX_EXPORT)
             {
                 QString tcx(QString(tr("%1/%2.tcx")).arg(default_dir).arg(multi_sessions[multi_sessions_iter]));
@@ -75,7 +79,7 @@ void V800export::export_sessions(QList<QString> sessions, unsigned char mode)
 
             if(mode & HRM_EXPORT)
             {
-                QString hrm(QString(tr("%1/%2")).arg(default_dir).arg(multi_sessions[multi_sessions_iter]));
+                QString hrm(QString(tr("%1/%2")).arg(default_dir).arg(tag));
                 QStringList hrm_out = parser.writeHRM(hrm);
                 if(hrm_out.length() < 1)
                     emit export_session_error(sessions[sessions_iter], HRM_ERROR);
@@ -91,7 +95,7 @@ void V800export::export_sessions(QList<QString> sessions, unsigned char mode)
 
             if(mode & GPX_EXPORT)
             {
-                QString gpx(QString(tr("%1/%2.gpx")).arg(default_dir).arg(multi_sessions[multi_sessions_iter]));
+                QString gpx(QString(tr("%1/%2.gpx")).arg(default_dir).arg(tag));
                 if(!parser.writeGPX(gpx))
                     emit export_session_error(sessions[sessions_iter], GPX_ERROR);
             }
