@@ -23,22 +23,6 @@
 #include <QDebug>
 #include <QtEndian>
 
-// Template specialisation for double (not included in Qt).
-template<> double qFromLittleEndian<double>(const uchar * src)
-{
-    Q_ASSERT(sizeof(double) == sizeof(quint64));
-    const quint64 value = qFromLittleEndian<quint64>(src);
-    return *reinterpret_cast<const double *>(&value);
-}
-
-// Template specialisation for float (not included in Qt).
-template<> float qFromLittleEndian<float>(const uchar * src)
-{
-    Q_ASSERT(sizeof(float) == sizeof(quint32));
-    const quint32 value = qFromLittleEndian<quint32>(src);
-    return *reinterpret_cast<const float *>(&value);
-}
-
 namespace ProtoBuf {
 
 /// @tparam  Type  May be one of: qint32, quint32, qint64, quint64, float or double.
