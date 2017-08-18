@@ -86,7 +86,6 @@ V800Main::V800Main(QWidget *parent) :
     devices.append(tr("V800"));
     devices.append(tr("M400"));
 
-    bool ok;
     QString selected_device;
     /*
     selected_device = QInputDialog::getItem(this, tr("Select Device"), tr("Device:"), devices, 0, false, &ok);

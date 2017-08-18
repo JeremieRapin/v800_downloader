@@ -2028,7 +2028,7 @@ QStringList TrainingSession::toHRM(const bool rrDataOnly) const
  * @see http://developer.garmin.com/schemas/tcx/v2/
  * @see http://www8.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd
  */
-QDomDocument TrainingSession::toTCX(const QString &buildTime) const
+QDomDocument TrainingSession::toTCX(const QString &) const
 {
     QDomDocument doc;
     doc.appendChild(doc.createProcessingInstruction(QLatin1String("xml"),
