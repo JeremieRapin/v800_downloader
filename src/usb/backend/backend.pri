@@ -10,8 +10,8 @@ win32 {
 }
 
 linux {
-    INCLUDEPATH += $$PWD/../../../binary/linux/libusb-1.0
-    LIBS += $$PWD/../../../binary/linux/libusb-1.0/libusb-1.0.a -ludev
+    INCLUDEPATH += /usr/include/libusb-1.0
+    LIBS += -lusb-1.0 -ludev
 }
 
 macx {
