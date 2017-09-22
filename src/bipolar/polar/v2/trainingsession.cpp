@@ -1508,6 +1508,7 @@ QString TrainingSession::toPDD(void) const
         const QVariantMap samples    = map.value(SAMPLES).toMap();
         const QVariantMap stats      = map.value(STATISTICS).toMap();
         const QVariantMap zones      = map.value(ZONES).toMap();
+        int ascent = qRound(first(create.value(QLatin1String("ascent"))).toFloat());
 
         const QDateTime startTime = getDateTime(firstMap(create.value(QLatin1String("start"))));
 
@@ -1531,13 +1532,22 @@ QString TrainingSession::toPDD(void) const
         //Row 7
         stream << "0\t0\t0\t0\t0\t0\r\n";
 
-        //Daily Information
+        //Exercise Information
         //Header
         stream << "\r\n\r\n[ExerciseInfo1]\r\n";
         //Row 0
         stream << "101\t1\t24\t6\t12\t512\r\n";
         //Row 1
-        stream << "0\t0\t0\t6\t12\t512\r\n";
+        stream << "0\t0\t0\t";
+        stream << qRound(first(create.value(QLatin1String("distance"))).toFloat()) << "\t";
+        QString stHours = startTime.toString(QLatin1String("hh"));
+        int hours = stHours.toInt() * 3600;
+        QString stMinutes = startTime.toString(QLatin1String("mm"));
+        int minutes = stMinutes.toInt() * 60;
+        QString stSeconds = startTime.toString(QLatin1String("ss"));
+        int seconds = stSeconds.toInt();
+        stream << (hours + minutes + seconds) << "\t";
+        stream << (getDuration(firstMap(create.value(QLatin1String("duration")))) / 1000) << "\t\r\n";
         //Row 2
         stream << "1\t";
         stream << qRound(first(create.value(QLatin1String("distance"))).toFloat()/100.0) << "\t";
@@ -1546,7 +1556,7 @@ QString TrainingSession::toPDD(void) const
         //Row 3
         stream << qRound(first(create.value(QLatin1String("distance"))).toFloat()) << "\t";
         stream << "0\t0\t0\t0\t";
-        stream << qRound(first(create.value(QLatin1String("ascent"))).toFloat()) << "\r\n";
+        stream << ascent << "\r\n";
         //Row 4
         stream << "0\t0\t0\t0\t0\t0\r\n";
         //Row 5
@@ -1573,10 +1583,10 @@ QString TrainingSession::toPDD(void) const
         //Row 7
         stream << "0\t0\t0\t0\t0\t0\r\n";
         //Row 8
-        stream << "0\t0\t0\t0";
+        stream << "0\t0\t0\t0\t";
         const quint64 recordInterval = getDuration(firstMap(samples.value(QLatin1String("record-interval"))));
         stream << qRound(recordInterval / 1000.0) << "\t";
-        stream << qRound(first(create.value(QLatin1String("ascent"))).toFloat()) << "\r\n";
+        stream << ascent << "\r\n";
         //Row 9
         stream << "0\t0\t0\t0\t0\t0\r\n";
         //Row 10
