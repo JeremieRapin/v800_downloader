@@ -50,7 +50,7 @@ void V800export::export_sessions(QList<QString> sessions, unsigned char mode)
         QStringList multi_sessions = filter_dir.entryList();
         for(multi_sessions_iter = 0; multi_sessions_iter < multi_sessions.length(); multi_sessions_iter++)
         {
-            if(!make_bipolar_names(multi_sessions[multi_sessions_iter]))
+            if(!make_bipolar_names(multi_sessions[multi_sessions_iter], mode))
             {
                 emit export_session_error(sessions[sessions_iter], RENAME_ERROR);
                 continue;
@@ -109,7 +109,7 @@ void V800export::export_sessions(QList<QString> sessions, unsigned char mode)
     emit export_sessions_done();
 }
 
-bool V800export::make_bipolar_names(QString session)
+bool V800export::make_bipolar_names(QString session, unsigned char mode)
 {
     QSettings settings;
     QString default_dir = settings.value(tr("default_dir")).toString();
@@ -148,12 +148,19 @@ bool V800export::make_bipolar_names(QString session)
     if(QFile::exists(file))
         QFile::rename(file, new_file);
 
-    file = QString(tr("%1/ROUTE.GZB")).arg(session_path);
-    new_file = QString(tr("%1/v2-users-0000000-training-sessions-%2-exercises-%3-route")).arg(session_path).arg(session).arg(session);
-    if(QFile::exists(file))
-        QFile::rename(file, new_file);
-    else
-        return false;
+    /* Don't care about Route if no GPX is needed
+     * Indeed, I think about a bug if follow traces options is set.
+     * Need to investigate more, ...
+    */
+    if (mode & GPX_EXPORT)
+    {
+      file = QString(tr("%1/ROUTE.GZB")).arg(session_path);
+      new_file = QString(tr("%1/v2-users-0000000-training-sessions-%2-exercises-%3-route")).arg(session_path).arg(session).arg(session);
+      if(QFile::exists(file))
+          QFile::rename(file, new_file);
+      else
+          return false;
+    }
 
     file = QString(tr("%1/SAMPLES.GZB")).arg(session_path);
     new_file = QString(tr("%1/v2-users-0000000-training-sessions-%2-exercises-%3-samples")).arg(session_path).arg(session).arg(session);

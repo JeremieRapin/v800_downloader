@@ -54,7 +54,7 @@ public slots:
     void export_sessions(QList<QString> sessions, unsigned char mode);
 
 private:
-    bool make_bipolar_names(QString session);
+    bool make_bipolar_names(QString session, unsigned char mode);
 
 };
 
